@@ -69,25 +69,17 @@ Annoying, right? Like interrupting flow just when things get **thicc** with cont
 ### 🎯 **Core Features**
 
 <table>
-<tr>
-<td width="50%">
 
 ✅ **Lightning fast** compression  
 ✅ **Zero current context loss** (preserves recent context)  
 ✅ **AI-powered summarization** (optional)  
 ✅ **Tool pair integrity validation**  
 ✅ **Batch processing** (multiple files at once)  
-
-</td>
-<td width="50%">
-
 ✅ **Graceful degradation** (falls back to Safe mode)  
 ✅ **Auto model selection** (mistral → phi3 → llama2)  
 ✅ **Context-aware deletion** (preserves snapshots)  
 ✅ **Claude Code compatible** (pure JSONL output)  
 
-</td>
-</tr>
 </table>
 
 ---
