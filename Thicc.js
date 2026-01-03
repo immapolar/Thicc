@@ -6,6 +6,8 @@ import { PromptForMode } from './Lib/Cli/InteractivePrompt.js';
 import { CheckOllamaAvailability } from './Lib/Ai/OllamaClient.js';
 import { SelectBestModel, GetModelFromEnvironment, GetTemperatureFromEnvironment } from './Lib/Ai/ModelSelector.js';
 import { ProcessConversation } from './Lib/Core/ConversationProcessor.js';
+import { FindSessionFile } from './Lib/Io/SessionFileFinder.js';
+import { MonitorAndCompress } from './Lib/Core/SmartMonitor.js';
 import { 
   PrintHeader, 
   PrintFileDiscovery, 
@@ -59,6 +61,27 @@ async function Main() {
   const argResult = ParseArguments();
   let mode = argResult.mode;
 
+  if (argResult.smart && argResult.sessionId) {
+    PrintHeader();
+    
+    console.log(' Smart Mode Activated\n');
+    
+    const findResult = await FindSessionFile(argResult.sessionId);
+    
+    if (!findResult.success) {
+      PrintError(findResult.error);
+      process.exit(1);
+    }
+    
+    const sizeKB = (findResult.fileSize / 1024).toFixed(2);
+    console.log(` Session found!`);
+    console.log(`   Project > ${findResult.projectName}`);
+    console.log(`   Current size > ${sizeKB} KB`);
+    
+    await MonitorAndCompress(findResult.filePath, argResult.sessionId);
+    return;
+  }
+
   if (argResult.interactive) {
     PrintHeader();
     
@@ -77,6 +100,25 @@ async function Main() {
     }
     
     mode = promptResult.mode;
+    
+    if (mode === 4 && promptResult.sessionId) {
+      console.log('\n Smart Mode Activated\n');
+      
+      const findResult = await FindSessionFile(promptResult.sessionId);
+      
+      if (!findResult.success) {
+        PrintError(findResult.error);
+        process.exit(1);
+      }
+      
+      const sizeKB = (findResult.fileSize / 1024).toFixed(2);
+      console.log(` Session found!`);
+      console.log(`   Project > ${findResult.projectName}`);
+      console.log(`   Current size > ${sizeKB} KB`);
+      
+      await MonitorAndCompress(findResult.filePath, promptResult.sessionId);
+      return;
+    }
   } else {
     PrintHeader();
   }

@@ -68,8 +68,6 @@ Annoying, right? Like interrupting flow just when things get **thicc** with cont
 
 ### 🎯 **Core Features**
 
-<table>
-
 ✅ **Lightning fast** compression  
 ✅ **Zero current context loss** (preserves recent context)  
 ✅ **AI-powered summarization** (optional)  
@@ -80,7 +78,6 @@ Annoying, right? Like interrupting flow just when things get **thicc** with cont
 ✅ **Context-aware deletion** (preserves snapshots)  
 ✅ **Claude Code compatible** (pure JSONL output)  
 
-</table>
 
 ---
 
@@ -124,10 +121,14 @@ node Thicc.js --aggressive
 node Thicc.js --hard
 node Thicc.js -a
 
+# Smart mode (real-time monitoring, 3-7% per pass)
+node Thicc.js --smart <Session ID>
+
 # Specify mode by number
 node Thicc.js --mode 1    # Safe
 node Thicc.js --mode 2    # Medium
 node Thicc.js --mode 3    # Aggressive
+node Thicc.js --mode 4    # Smart (requires session ID)
 ```
 
 ### **Help**
@@ -180,6 +181,47 @@ node Thicc.js --help
 4. Verifies tool pair integrity
 5. **Speed:** **~20-30 seconds**
 6. **Reduction:** **15-25%**
+
+</details>
+
+<details>
+<summary><b>🧠 Smart Mode (Real-Time Monitoring)</b></summary>
+
+<br/>
+
+**Strategy:**
+1. Automatically locates session file in `%USERPROFILE%/.claude/projects/*/*`
+2. Monitors file size in real-time (polls every 3 seconds)
+3. **Only intervenes when file exceeds 1500 KB initially**
+4. Performs surgical deletion (3-7% per pass) using Safe mode algorithm
+5. **Dynamically updates the file** — removes only identified deletion range
+6. **Never touches middle or recent sections** of the conversation
+7. **Intelligent threshold management** — compresses once per +500 KB growth (cumulative)
+8. Continues monitoring indefinitely until stopped (Ctrl+C) or session ends
+9. **Speed:** Real-time, zero disruption to active conversation
+10. **Reduction:** **3-7% per pass** (conservative, repeatable)
+
+**Use Case:**
+Perfect for active, long-running Claude Code sessions. Start monitoring at the beginning of your session and forget about it — Smart Mode keeps your conversation optimized without interrupting your flow.
+
+**Threshold Logic:**
+- First compression: When file reaches **1500 KB**
+- Subsequent compressions: Every **+500 KB** from last compression
+- Example flow:
+  - Start: 800 KB → Monitoring...
+  - Grows to: 1500 KB → **Compress** → 1381 KB
+  - Grows to: 1881 KB (1381 + 500) → **Compress** → 1732 KB
+  - Grows to: 2232 KB (1732 + 500) → **Compress** → 2065 KB
+  - And so on...
+
+**Example:**
+```bash
+# Get your session ID from /status command
+node Thicc.js --smart 8d87c742-381b-48d5-9173-27b86de5061c
+
+# Or use interactive mode and select option 4
+node Thicc.js
+```
 
 </details>
 
@@ -237,6 +279,7 @@ As soon as the **"Context low · Run /compact to compact & continue"** warning a
 <th><b>Thicc (Safe)</b></th>
 <th><b>Thicc (Medium)</b></th>
 <th><b>Thicc (Aggressive)</b></th>
+<th><b>Thicc (Smart)</b></th>
 </tr>
 </thead>
 <tbody>
@@ -246,10 +289,12 @@ As soon as the **"Context low · Run /compact to compact & continue"** warning a
 <td>&lt; 5 seconds</td>
 <td>~20-30 seconds</td>
 <td>~20-30 seconds</td>
+<td>Real-time (automatic)</td>
 </tr>
 <tr>
 <td><b>Token Cost</b></td>
 <td>Up to 40,000</td>
+<td>Zero</td>
 <td>Zero</td>
 <td>Zero</td>
 <td>Zero</td>
@@ -260,10 +305,12 @@ As soon as the **"Context low · Run /compact to compact & continue"** warning a
 <td>Zero</td>
 <td>Zero</td>
 <td>Zero</td>
+<td>Zero</td>
 </tr>
 <tr>
 <td><b>Instruction Retention</b></td>
 <td>Unreliable</td>
+<td>Perfect</td>
 <td>Perfect</td>
 <td>Perfect</td>
 <td>Perfect</td>
@@ -274,6 +321,15 @@ As soon as the **"Context low · Run /compact to compact & continue"** warning a
 <td>5-10%</td>
 <td>10-20%</td>
 <td>15-25%</td>
+<td>3-7% per pass</td>
+</tr>
+<tr>
+<td><b>Use Case</b></td>
+<td>Manual intervention</td>
+<td>Quick one-time</td>
+<td>Balanced compression</td>
+<td>Maximum squeeze</td>
+<td>Active sessions</td>
 </tr>
 </tbody>
 </table>

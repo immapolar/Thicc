@@ -9,22 +9,24 @@ function ParseArguments() {
     .option('-m, --medium', 'Use medium compression mode (10-20% reduction)')
     .option('-a, --aggressive', 'Use aggressive compression mode (15-25% reduction)')
     .option('--hard', 'Alias for aggressive mode')
-    .option('--mode <number>', 'Specify mode by number (1=safe, 2=medium, 3=aggressive)')
+    .option('--smart <sessionId>', 'Smart real-time monitoring mode (3-7% per pass, monitors active session)')
+    .option('--mode <number>', 'Specify mode by number (1=safe, 2=medium, 3=aggressive, 4=smart)')
     .parse();
 
   const options = program.opts();
   
-  if (options.safe) return { mode: 1, interactive: false };
-  if (options.medium) return { mode: 2, interactive: false };
-  if (options.aggressive || options.hard) return { mode: 3, interactive: false };
+  if (options.safe) return { mode: 1, interactive: false, smart: false };
+  if (options.medium) return { mode: 2, interactive: false, smart: false };
+  if (options.aggressive || options.hard) return { mode: 3, interactive: false, smart: false };
+  if (options.smart) return { mode: 4, interactive: false, smart: true, sessionId: options.smart };
   if (options.mode) {
     const modeNum = parseInt(options.mode);
-    if (modeNum >= 1 && modeNum <= 3) {
-      return { mode: modeNum, interactive: false };
+    if (modeNum >= 1 && modeNum <= 4) {
+      return { mode: modeNum, interactive: false, smart: modeNum === 4 };
     }
   }
   
-  return { mode: null, interactive: true };
+  return { mode: null, interactive: true, smart: false };
 }
 
 export { ParseArguments };

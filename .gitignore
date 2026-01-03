@@ -1,4 +1,6 @@
 node_modules/
-     Src/*.jsonl
-     Dist/*.jsonl
-     .env
+package-lock.json
+Src/*.jsonl
+Dist/*.jsonl
+.env
+CLAUDE.md
