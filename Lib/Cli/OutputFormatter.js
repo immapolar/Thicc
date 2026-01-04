@@ -22,19 +22,18 @@ function PrintProcessingStart(fileName, mode) {
   console.log(`Mode > ${modeNames[mode]}\n`);
 }
 
-function PrintValidationResult(parseResult, validationResult) {
+function PrintValidationResult(parseResult, validationResult, initialOrphanLog) {
   if (parseResult.success) {
     console.log(`Parsed > ${parseResult.validMessages} messages`);
   } else {
     console.warn(`Parse hiccups > ${parseResult.errors.length}`);
   }
   
-  console.log(`Validated > ${validationResult.totalPairs} tool pairs`);
-  
-  if (validationResult.hasOrphans) {
-    const orphanCount = validationResult.orphanedUses.length + validationResult.orphanedResults.length;
-    console.warn(`${orphanCount} orphaned tool pair(s) detected`);
+  if (initialOrphanLog) {
+    console.log(`Deleted > ${initialOrphanLog.orphansDeleted} orphaned tool pair(s)`);
   }
+  
+  console.log(`Validated > ${validationResult.totalPairs} tool pairs`);
 }
 
 function PrintCompressionResult(compressionResult) {

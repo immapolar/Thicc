@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { ParseJsonl } from '../Validation/JsonlParser.js';
 import { ValidateToolPairs } from '../Validation/ToolPairValidator.js';
+import { FindAndDeleteOrphans } from '../Helpers/OrphanResolver.js';
 import { CompressSmart } from '../Compression/SmartMode.js';
 import { PatchFile, GetFileLines } from '../Io/FilePatcher.js';
 import { ShimmerStatus } from '../Cli/ShimmerStatus.js';
@@ -99,8 +100,21 @@ async function MonitorAndCompress(filePath, sessionId) {
           return;
         }
         
-        const validationData = ValidateToolPairs(parseResult.messages);
-        const compressionResult = CompressSmart(parseResult.messages, validationData);
+        let workingMessages = parseResult.messages;
+        
+        const initialValidation = ValidateToolPairs(workingMessages);
+        if (initialValidation.hasOrphans) {
+          const orphanResult = FindAndDeleteOrphans(
+            workingMessages,
+            initialValidation.orphanedUses,
+            initialValidation.orphanedResults
+          );
+          workingMessages = orphanResult.messages;
+          console.log(`     Deleted ${orphanResult.deletedCount} pre-existing orphaned tool pair(s)`);
+        }
+        
+        const validationData = ValidateToolPairs(workingMessages);
+        const compressionResult = CompressSmart(workingMessages, validationData);
         
         if (compressionResult.skipped) {
           console.log(`     ${compressionResult.reason}`);

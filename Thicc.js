@@ -174,7 +174,7 @@ async function Main() {
       continue;
     }
 
-    PrintValidationResult(result.parseResult, result.toolPairValidation);
+    PrintValidationResult(result.parseResult, result.toolPairValidation, result.initialOrphanLog);
     
     if (mode === 2 || mode === 3) {
       if (useAI) {
